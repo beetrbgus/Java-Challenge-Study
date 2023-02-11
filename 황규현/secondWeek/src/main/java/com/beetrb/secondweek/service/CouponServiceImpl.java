@@ -1,6 +1,5 @@
 package com.beetrb.secondweek.service;
 
-import com.beetrb.secondweek.common.ResponseDto;
 import com.beetrb.secondweek.dto.CouponResponseDto;
 import com.beetrb.secondweek.persistence.Coupon;
 import com.beetrb.secondweek.repository.CouponRepository;
@@ -22,17 +21,14 @@ public class CouponServiceImpl implements CouponService{
     }
 
     @Override
-    public ResponseDto getCouponByKoreanAndSymbol(String name) {
+    public CouponResponseDto getCouponByKoreanAndSymbol(String name) {
         Coupon coupon = couponRepository.getCouponByKoreanOrSymbol(name)
                 .orElseThrow();
         if(LocalDateTime.now().isBefore(coupon.getCreatedAt())
             || LocalDateTime.now().isAfter(coupon.getExpiredAt())) {
             coupon.expiredCoupon();
             couponRepository.save(coupon);
-            return ResponseDto.builder()
-                    .data("만료된 쿠폰입니다.").build();
         }
-        return ResponseDto.builder()
-                .data(coupon).build();
+        return new CouponResponseDto(coupon);
     }
 }

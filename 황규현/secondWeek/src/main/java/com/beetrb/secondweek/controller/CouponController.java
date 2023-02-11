@@ -7,14 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/coupon")
@@ -24,7 +20,9 @@ public class CouponController {
 
     @PostMapping
     public ResponseEntity<ResponseDto> useCoupon(@RequestBody CouponRequestDto requestDto) {
-        if(!StringUtils.hasText(requestDto.getCouponName())) {
+        if(requestDto.getCouponName() == null
+            || !StringUtils.hasText(requestDto.getCouponName())) {
+
             HttpHeaders resHeaders = new HttpHeaders();
             resHeaders.add("Content-Type", "application/json;charset=UTF-8");
             return ResponseEntity
@@ -37,8 +35,14 @@ public class CouponController {
                             .build()
                     );
         }
+
         return ResponseEntity.ok(
-                couponService.getCouponByKoreanAndSymbol(requestDto.getCouponName())
+                ResponseDto
+                    .builder()
+                    .data(couponService.getCouponByKoreanAndSymbol(
+                            requestDto.getCouponName())
+                    )
+                    .build()
         );
     }
 }
